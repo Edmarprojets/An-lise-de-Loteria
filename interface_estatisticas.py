@@ -1,4 +1,5 @@
 import flet as ft
+from atualizar_estatisticas import Atualizarbd
 
 def pagina_estatisticas(page:ft.Page):
     dp_tipo_jogo=ft.Dropdown(
@@ -9,6 +10,18 @@ def pagina_estatisticas(page:ft.Page):
             ft.dropdown.Option("Lotomania")],
         value='Lotofacil',
     )
+    def atualizar_concursos(e):
+        instancia_atualizar_concurso=Atualizarbd(dp_tipo_jogo.value)
+        instancia_atualizar_concurso.modo_jogo()
+        instancia_atualizar_concurso.analise_individual()
+        instancia_atualizar_concurso.analise_geral_freq()
+        instancia_atualizar_concurso.analise_geral_par_impar()
+        instancia_atualizar_concurso.analise_geral_soma_total()
+        instancia_atualizar_concurso.quantoTempoNaoSai()
+        instancia_atualizar_concurso.numeros_herdados()
+        instancia_atualizar_concurso.atualizado_em()
+
+
     def buscar_arquivo(e: ft.FilePickerResultEvent):
         #função que identifica o arquivo selecionado
         if e.files:
@@ -44,7 +57,7 @@ def pagina_estatisticas(page:ft.Page):
             ft.Column(
                 col=2,
                 controls=[
-                    btn_atualizar :=ft.ElevatedButton('Atualizar_estátistica', disabled=True )
+                    btn_atualizar :=ft.ElevatedButton('Atualizar_estátistica',on_click=atualizar_concursos )
                 ]
             )   
         ]

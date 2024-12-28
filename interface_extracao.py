@@ -54,8 +54,8 @@ def pagina_extracao(pagina: ft.Page):
             hora_formatada=horario.strftime("%d-%m-%y-%H_%M_%S")
             instancia_extrair=Extracao(hora_formatada)
             instancia_extrair.definir_navegador(jogo)
-            for concurso in range(inicio,final+1):
-                instancia_extrair.buscar_concursos(concurso)
+            #for concurso in range(inicio,final+1):
+            instancia_extrair.busca_alternativa(inicio, final)
             
             txt_status_extracao.value="Realizando apuração do arquivo..."
             txt_status_extracao.color="green"

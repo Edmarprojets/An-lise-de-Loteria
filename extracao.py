@@ -20,8 +20,9 @@ class Extracao():
         self.driver = webdriver.Chrome() 
         self.driver.get("https://loterias.caixa.gov.br/Paginas/" + self.modo_jogo +".aspx")
         self.driver.maximize_window()
-        pyautogui.FAILSAFE = True #desfaz a ação padrão, de cancelar a ação caso mouse esteja em um dos cantos.
+        #pyautogui.FAILSAFE = True #desfaz a ação padrão, de cancelar a ação caso mouse esteja em um dos cantos.
         #self.arquivo=open(self.modo_jogo +'.txt','a')
+        time.sleep(15)
         
     def escrever_resultado(self):
         #armazena o numero/data do concurso e as dezenas sorteadas
@@ -42,7 +43,7 @@ class Extracao():
 
     def buscar_concursos(self,numero):
         #realiza a busca do concurso passado em parâmetros
-        campo_busca=self.driver.find_element(By .XPATH, '//*[@id="buscaConcurso"]')
+        campo_busca=self.driver.find_element(By.XPATH, '//*[@id="buscaConcurso"]')
         campo_busca.clear()
         campo_busca.click()
         campo_busca.send_keys(numero)
@@ -64,8 +65,24 @@ class Extracao():
         #com os dados em tela chama o metodo escrever_resultado
         self.escrever_resultado()
 
+    def busca_alternativa(self, inicio, fim):
+        contador = fim - inicio 
+        voltar=self.driver.find_element(By.XPATH,'//*[@id="wp_resultados"]/div[1]/div/div[2]/ul/li[2]/a')
+        avancar=self.driver.find_element(By.XPATH,'//*[@id="wp_resultados"]/div[1]/div/div[2]/ul/li[3]/a')
+        for x in range(0,contador,1):
+            voltar.click()
+            time.sleep(4)
+        for x in range(0,contador+1,1):
+            time.sleep(4)
+            self.escrever_resultado()
+            time.sleep(1)
+            avancar.click()
+            
+
 
     def __del__(self):
         pass
+
+
 
 

@@ -3,10 +3,10 @@ import psycopg2
 
 class Atualizarbd():
 
-    def __init__(self, tipo_jogo,ultimo_concurso):
+    def __init__(self, tipo_jogo):
         self.plpgsql="apurar_frequencia"
         self.tipo_jogo=tipo_jogo
-        self.ultimo_concurso=ultimo_concurso
+        #self.ultimo_concurso=ultimo_concurso
         self.prefixo_tabela=''
         self.total_num_sorteado=0
         self.total_num=0
@@ -213,4 +213,52 @@ class Atualizarbd():
         self.con.commit()
         self.con.close()
 
+    def numeros_herdados(self):
+        self.conectarbd()
+        sql="select id_concurso, resultado from " + self.prefixo_tabela +"resultados where heranca is null and id_concurso <> 1 order by id_concurso asc "
+        self.cur.execute(sql)
+        resultado=self.cur.fetchall()
+        sql_comparativo="select resultado from " + self.prefixo_tabela + "resultados where id_concurso=%s"
+        classe_analise=analise_concursos.Analise(0, self.total_num_sorteado, self.prefixo_tabela,self.total_num)
+        if len(resultado) != 0:
+            for results in resultado:
+                str_numeros=' '
+                str_posicoes=' '
+                numero=results[0]
+                resultado_a_ser_comparado=results[1]
+                self.cur.execute(sql_comparativo,(str(numero-1),))
+                resultado_comparativo=self.cur.fetchall()
+                #obtendo as posições da lista até virar apenas uma string
+                resultado_comparativo=resultado_comparativo[0]
+                resultado_comparativo=resultado_comparativo[0]
+                #converte os resultados em uma lista de inteiros 
+                comparado=classe_analise.converter_str_int(resultado_a_ser_comparado)
+                comparativo=classe_analise.converter_str_int(resultado_comparativo)
+                for num in comparado:
+                    #verifica se o numero tbm saiu no concurso anterior e obtem sua posição
+                    if comparativo.count(num) != 0:
+                        posicao=comparativo.index(num) + 1
+                        #converte a posiçao em str
+                        if posicao in (0,1,2,3,4,5,6,7,8,9):
+                            str_posicoes +='0'+ str(posicao) +' '
+                        else:
+                            str_posicoes +=str(posicao) +' '
+                        #converte o numero em str
+                        if num in (0,1,2,3,4,5,6,7,8,9):
+                            str_numeros +='0'+ str(num) +' '
+                        else:
+                            str_numeros += str(num) + ' '
+                #executar update no banco
+                if str_numeros == ' ':
+                    self.cur.execute('update ' +self.prefixo_tabela + 'resultados set heranca=null,posicao=null  where id_concurso=%s', (numero,))
+                else:   
+                    self.cur.execute('update ' +self.prefixo_tabela + 'resultados set heranca=%s,posicao=%s  where id_concurso=%s', (str_numeros,str_posicoes,numero))
+                self.con.commit()
+        self.cur.close()
+
+             
+    
+#instancia_atualizar_concurso=Atualizarbd("Mega-Sena")
+#instancia_atualizar_concurso.modo_jogo()
+#instancia_atualizar_concurso.numeros_herdados()
 
